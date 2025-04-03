@@ -2,19 +2,16 @@
  * @Author: zhanghao
  * @Date: 2025-03-25 21:48:49
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-03 11:07:25
+ * @LastEditTime: 2025-04-03 17:10:17
  * @Description: 
  * @FilePath: /vite-vue/src/App.vue
 -->
-<script setup>
-import Demo from './components/Demo/index.vue'
-</script>
+<script setup></script>
 
 <template>
-
-  <!-- <HelloWorld msg="Vite + Vue" /> -->
-  <Demo />
+  <router-view></router-view>
 </template>
+
 <style>
 html,
 body {
