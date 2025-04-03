@@ -2,26 +2,20 @@
  * @Author: zhanghao
  * @Date: 2025-03-25 21:48:49
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-03-29 14:23:22
+ * @LastEditTime: 2025-04-03 11:07:25
  * @Description: 
  * @FilePath: /vite-vue/src/App.vue
 -->
 <script setup>
-import PSViewer from './components/PSViewer/PSViewer.vue'
+import Demo from './components/Demo/index.vue'
 </script>
 
 <template>
 
   <!-- <HelloWorld msg="Vite + Vue" /> -->
-  <PSViewer />
+  <Demo />
 </template>
-
 <style>
-* {
-  padding: 0;
-  margin: 0;
-}
-
 html,
 body {
   width: 100%;
