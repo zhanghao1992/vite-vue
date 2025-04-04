@@ -2,9 +2,9 @@
  * @Author: zhanghao
  * @Date: 2025-04-02 17:07:58
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-03 10:37:34
+ * @LastEditTime: 2025-04-03 21:58:22
  * @Description:
- * @FilePath: /vite-vue/src/components/Demo/config.js
+ * @FilePath: /vite-vue/src/pages/Demo/config.js
  */
 import image1 from "./images/3.png";
 import image2 from "./images/GS__0177.jpg";
@@ -45,7 +45,7 @@ const imageConfig = [
         zoomLvl: 100,
         data: "marker1 data",
         tooltip: {
-          content: "打印机. <b>Click me!</b>",
+          content: "打印机. 我是一个普通的tooltip",
           // component: toolTip,
           // props: {
           //   title: "打印机",
@@ -61,12 +61,32 @@ const imageConfig = [
         size: { width: 32, height: 32 },
         anchor: "bottom center",
         zoomLvl: 100,
-        data: "marker1 data",
-        tooltip: {
-          content: "This is marker",
-          className: "custom-tooltip",
-          trigger: "click",
+        data: {
+          name: "marker2",
         },
+        // element: MyToolTip,
+        // tooltip: {
+        //   content: "This is marker",
+        //   className: "custom-tooltip",
+        //   trigger: "click",
+        // },
+      },
+      {
+        id: "marker3",
+        position: { yaw: -0.3, pitch: -0.3 },
+        image: chairImage,
+        size: { width: 32, height: 32 },
+        anchor: "bottom center",
+        zoomLvl: 100,
+        data: {
+          name: "marker3",
+        },
+        tooltip: {
+          content: "This is marker3",
+        },
+        // 重要：禁用原生 Tooltip
+        // hoverTooltip: null,
+        // clickTooltip: null,
       },
     ],
   },

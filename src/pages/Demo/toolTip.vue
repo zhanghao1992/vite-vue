@@ -2,9 +2,9 @@
  * @Author: zhanghao
  * @Date: 2025-04-02 21:40:04
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-03 11:13:49
+ * @LastEditTime: 2025-04-03 20:57:54
  * @Description: 
- * @FilePath: /vite-vue/src/components/Demo/toolTip.vue
+ * @FilePath: /vite-vue/src/pages/Demo/toolTip.vue
 -->
 <template>
     <div class="tip-box">
@@ -37,8 +37,12 @@
 import { onMounted } from 'vue'
 const props = defineProps(['info'])
 
+const handleClick = () => {
+    console.log('click')
+}
+
 onMounted(() => {
-    console.log('asdasd')
+    // console.log('asdasd')
 })
 
 </script>
@@ -50,7 +54,8 @@ onMounted(() => {
     right: 0;
     top: 0;
     width: 200px;
-    background-color: rgba(0, 0, 0, .2);
+    background-color: rgba(0, 0, 0, .4);
+    border-radius: 6px;
     z-index: 10;
     color: #fff;
     padding: 10px 20px;
