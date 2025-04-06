@@ -2,32 +2,36 @@
  * @Author: zhanghao
  * @Date: 2025-03-25 21:54:53
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-03 21:57:40
+ * @LastEditTime: 2025-04-05 10:20:59
  * @Description: 北京demo
  * @FilePath: /vite-vue/src/pages/Demo/index.vue
 -->
 <template>
-    <div class="my-tab">
-        <el-segmented v-model="state.currentImg" :options="options" />
-        {{ `${state.activeMarker}px` }}{{ state.num }}
+    <div class="viewerWrapper">
+        <div class="my-tab">
+            <el-segmented v-model="state.currentImg" :options="options" />
+            {{ `${state.activeMarker}px` }}{{ state.num }}
+        </div>
+
+        <MyToolTip :info="{ name: '打印机' }" />
+        <MyToolTip v-show="state.activeMarker !== null" :info="{ name: '打印机' }"
+            :style="{ left: `${state.activeMarker?.position?.x}px`, top: `${state.activeMarker?.position?.y}px` }" />
+
+
+        <CustomTooltip ref="tooltipRef" @custom-action="handleCustomAction">
+            <!-- 可覆盖默认插槽 -->
+            <template #default="{ marker }">
+                自定义内容: {{ marker.config.id }}
+                <el-button type="primary" @click="handleClick(marker)" size="small">点击</el-button>
+            </template>
+        </CustomTooltip>
+
+
+        <!-- <MyToolTip :info="{ name: '打印机' }" :style="{ left: '882px' }" /> -->
+        <div id="viewer" ref="viewerDom"></div>
+
     </div>
 
-    <MyToolTip :info="{ name: '打印机' }" />
-    <MyToolTip v-show="state.activeMarker !== null" :info="{ name: '打印机' }"
-        :style="{ left: `${state.activeMarker?.position?.x}px`, top: `${state.activeMarker?.position?.y}px` }" />
-
-
-    <CustomTooltip ref="tooltipRef" @custom-action="handleCustomAction">
-        <!-- 可覆盖默认插槽 -->
-        <template #default="{ marker }">
-            自定义内容: {{ marker.config.id }}
-            <el-button type="primary" @click="handleClick(marker)" size="small">点击</el-button>
-        </template>
-    </CustomTooltip>
-
-
-    <!-- <MyToolTip :info="{ name: '打印机' }" :style="{ left: '882px' }" /> -->
-    <div id="viewer" ref="viewerDom"></div>
 </template>
 
 <script setup>

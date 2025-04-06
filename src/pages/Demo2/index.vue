@@ -1,0 +1,292 @@
+<!--
+ * @Author: zhanghao
+ * @Date: 2025-03-25 21:54:53
+ * @LastEditors: zhanghao
+ * @LastEditTime: 2025-04-06 09:08:06
+ * @Description: 北京demo
+ * @FilePath: /vite-vue/src/pages/Demo2/index.vue
+-->
+<template>
+    <div class="viewerWrapper">
+        <!-- <div class="my-tab">
+            <el-segmented v-model="state.currentScene" :options="options" />
+        </div> -->
+
+        <div id="viewer" ref="viewerDom"></div>
+
+        <CustomPopover v-for="(marker) in state.customMarkers" :ref="(el) => setRefMap(el, marker)" :visible="true"
+            :marker="marker" @click-action="handleClickAction">
+        </CustomPopover>
+
+        <CustomStep v-for="(marker) in state.customStepMarkers" :ref="(el) => setRefMap(el, marker)" :visible="true"
+            :marker="marker" @click-action="handleClickAction">
+        </CustomStep>
+    </div>
+</template>
+
+
+
+
+<script setup>
+import CustomPopover from "./CustomPopover.vue";
+import CustomTooltip from "./CustomTooltip.vue";
+import DirectionSign from "./DirectionSign.vue";
+import CustomStep from "./CustomStep.vue";
+import {
+    Check,
+    Delete,
+    Edit,
+    Message,
+    Search,
+    Star,
+} from '@element-plus/icons-vue'
+
+// 必须引入官方提供的样式文件
+import '@photo-sphere-viewer/core/index.css';
+import { Viewer } from '@photo-sphere-viewer/core';
+
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import '@photo-sphere-viewer/markers-plugin/index.css'
+
+import { sceneConfig } from './config'
+
+
+import image from './images/GS__0172.jpg'
+import tipImage from './images/icon/tip.png'
+import { ref, unref, reactive, watch, onMounted, onUpdated } from 'vue'
+
+import loadingImg from './images/icon/loading.gif'
+
+
+const options = sceneConfig.map(i => i.name)
+
+const state = reactive({
+    currentScene: options[0],
+    markers: [],
+    customMarkers: [],
+    customStepMarkers: [],
+    needHideMarkers: [],
+    activeMarker: null,
+})
+
+
+const viewerDom = ref(null)
+
+let viewer = null
+
+let markersPlugin = null
+
+let debounceTimer = null
+
+const refMap = ref({})
+const setRefMap = (el, marker) => {
+    if (el) {
+        refMap.value[marker.config.id] = el
+    }
+}
+
+watch(() => state.currentScene, (newVal, oldVal) => {
+    console.log(newVal);
+    const index = sceneConfig.findIndex(i => i.name === newVal)
+    // initViewer(imageConfig[index])
+    changeScene(sceneConfig[index])
+
+
+})
+
+watch(() => state.markers, (newVal, oldVal) => {
+    state.customMarkers = state.markers.filter(m => m.config.data.type === 'custom')
+    state.customStepMarkers = state.markers.filter(m => m.config.data.type === 'customStep')
+    state.needHideMarkers = state.markers.filter(m => m.config.data.type !== 'default').map(m => m.config.id)
+})
+
+onUpdated(() => {
+    console.log(state.needHideMarkers);
+    state.needHideMarkers.forEach(id => {
+        document.querySelector(`#psv-marker-${id}`).style.display = 'none'
+    })
+
+
+
+})
+
+const changeScene = (scene) => {
+    viewer.setPanorama(scene.img, {
+        zoom: 0
+    }).then(() => {
+        makeMarkers(viewer, scene)
+    })
+}
+
+
+const setActiveMarker = (markerData) => {
+    state.activeMarker = markerData
+}
+/**
+ * @description: 初始化viewer
+ * @param {*} imgData
+ * @return {*}
+ */
+const initViewer = (sceneData) => {
+    if (viewer) destroyViewer()
+    viewer = new Viewer({
+        container: viewerDom.value,
+        panorama: sceneData?.img,
+        caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+        // 设置图片描述
+        description: "这是一个描述,xxxxxxxxxxxxxxxxx",
+        loadingImg,
+        size: {
+            width: '100%',
+            height: '100%'
+        },
+        canvasBackground: '#77addb',
+        defaultZoomLvl: 0,
+        // maxFov: 100,
+        // minFov: 0,
+        navbar: ['zoom', 'move', 'download', 'fullscreen'],
+        plugins: [
+            [MarkersPlugin, {
+                // markers: imgData.markers
+            }],
+        ],
+    });
+
+    markersPlugin = viewer.getPlugin(MarkersPlugin);
+    initEvents(viewer, sceneData)
+
+}
+
+/**
+ * @description: 初始化事件
+ * @return {*}
+ */
+const initEvents = (viewer, sceneData) => {
+    viewer.addEventListener('click', (e, data) => {
+        // 点击全景图事件
+        console.log('click e:', e)
+        state.activeMarker = null
+    })
+
+
+    viewer.addEventListener('position-updated', (e) => {
+        // console.log(e.position)
+        console.log('相面移动');
+
+    });
+
+    viewer.addEventListener('zoom-updated', ({ zoomLevel }) => {
+        console.log(`new zoom level is ${zoomLevel}`);
+    });
+
+
+    // 在 addMarker 后添加事件监听
+    markersPlugin.addEventListener('select-marker', (e) => {
+
+        const { data, state } = e.marker
+        console.log(data);
+        if (data.type === 'customStep') {
+            viewer.animate({
+                yaw: data.yaw,
+                pitch: data.pitch,
+                zoom: data.zoom,
+                speed: '15rpm',
+            })
+        }
+
+        // setActiveMarker({
+        //     marker: e.marker,
+        //     position: state.position2D
+        // })
+
+        // console.log('marker在屏幕上的坐标', e.marker.state.position2D);
+    });
+
+    viewer.addEventListener('ready', () => {
+        console.log(`viewer is ready`);
+
+        // markersPlugin.hideMarker('marker1')
+        // markersPlugin.showMarker('marker1')
+        // markersPlugin.showMarkerTooltip('marker1')
+        // viewer.animate({
+        //     zoom: 0,
+        //     speed: '200rpm',
+        // })
+
+        // viewer.setOptions({
+        //     zoomLevel: 0,
+        // })
+
+        viewer.zoom(0)
+
+        makeMarkers(viewer, sceneData)
+
+    });
+
+    // 在 render 事件中使用防抖更新位置
+    viewer.addEventListener('render', debounceUpdate);
+
+}
+
+const makeMarkers = (_, sceneData) => {
+    markersPlugin.clearMarkers()
+    sceneData.markers.forEach(m => {
+        markersPlugin.addMarker(m)
+        if (m.autoShow) {
+            markersPlugin.showMarkerTooltip(m.id)
+        }
+    })
+    state.markers = markersPlugin.getMarkers()
+}
+
+/**
+ * @description: 更新tip位置
+ * @return {*}
+ */
+const debounceUpdate = () => {
+    if (!debounceTimer) {
+        debounceTimer = requestAnimationFrame(() => {
+            Object.keys(refMap.value).forEach(key => {
+                refMap.value[key]?.updatePosition()
+            })
+            debounceTimer = null;
+        });
+    }
+}
+
+
+const destroyViewer = () => {
+    if (viewer) try {
+        viewer.destroy()
+    } catch (e) {
+        console.log(e)
+        viewerDom.value.removeChild(viewer.childNodes[0])
+    }
+}
+
+onMounted(() => {
+    initViewer(sceneConfig[0])
+    changeScene(sceneConfig[0])
+})
+
+
+const handleClickAction = (marker, data) => {
+    console.log('handleClickAction', marker, data);
+
+    if (marker.config.data.to) {
+        const sceneData = sceneConfig.find(item => item.name === marker.config.data.to)
+        changeScene(sceneData)
+    }
+
+
+
+}
+</script>
+
+
+
+
+
+<style lang="css" scoped>
+@import './style.less'
+</style>

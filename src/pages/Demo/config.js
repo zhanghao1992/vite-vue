@@ -2,11 +2,11 @@
  * @Author: zhanghao
  * @Date: 2025-04-02 17:07:58
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-03 21:58:22
+ * @LastEditTime: 2025-04-05 14:41:13
  * @Description:
  * @FilePath: /vite-vue/src/pages/Demo/config.js
  */
-import image1 from "./images/3.png";
+// import image1 from "./images/3.png";
 import image2 from "./images/GS__0177.jpg";
 import image3 from "./images/GS__0178.jpg";
 import image4 from "./images/GS__0179.jpg";
@@ -34,7 +34,7 @@ const imageConfig = [
   //   },
   {
     name: "img2",
-    img: image2,
+    img: image1,
     markers: [
       {
         id: "marker1",
@@ -52,7 +52,6 @@ const imageConfig = [
           //   content: "打印机. <button>Click me!</button>",
           // },
         },
-        // content: document.getElementById('lorem-content').innerHTML,
       },
       {
         id: "marker2",

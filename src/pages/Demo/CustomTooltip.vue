@@ -2,7 +2,7 @@
  * @Author: zhanghao
  * @Date: 2025-04-03 21:02:07
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-03 21:58:34
+ * @LastEditTime: 2025-04-05 19:31:25
  * @Description: 
  * @FilePath: /vite-vue/src/pages/Demo/CustomTooltip.vue
 -->
@@ -11,6 +11,7 @@
     <div v-if="visible" class="custom-tooltip" :style="{
         left: `${position.x}px`,
         top: `${position.y}px`,
+        pointerEvents: 'none'
     }" @mouseenter="hoverTooltip" @mouseleave="leaveTooltip">
         <slot :marker="currentMarker">
             <!-- 默认插槽内容 -->
