@@ -10,8 +10,9 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
-    "@photo-sphere-viewer/core": "^5.12.1",
-    "@photo-sphere-viewer/markers-plugin": "^5.12.1",
+    "@photo-sphere-viewer/autorotate-plugin": "^5.13.1",
+    "@photo-sphere-viewer/core": "^5.13.1",
+    "@photo-sphere-viewer/markers-plugin": "^5.13.1",
     "@tailwindcss/vite": "^4.1.1",
     "@vue/server-renderer": "^3.5.13",
     "@vueuse/core": "^13.0.0",

@@ -2,7 +2,7 @@
  * @Author: zhanghao
  * @Date: 2025-03-25 21:54:53
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-06 09:08:06
+ * @LastEditTime: 2025-04-07 22:03:46
  * @Description: 北京demo
  * @FilePath: /vite-vue/src/pages/Demo2/index.vue
 -->
@@ -43,7 +43,10 @@ import {
 
 // 必须引入官方提供的样式文件
 import '@photo-sphere-viewer/core/index.css';
-import { Viewer } from '@photo-sphere-viewer/core';
+import { Viewer, utils } from '@photo-sphere-viewer/core';
+
+
+import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import '@photo-sphere-viewer/markers-plugin/index.css'
@@ -57,6 +60,10 @@ import { ref, unref, reactive, watch, onMounted, onUpdated } from 'vue'
 
 import loadingImg from './images/icon/loading.gif'
 
+import { useDocumentVisibility } from '@vueuse/core'
+
+//窗口是不是激活状态
+const visibility = useDocumentVisibility()
 
 const options = sceneConfig.map(i => i.name)
 
@@ -75,10 +82,21 @@ const viewerDom = ref(null)
 let viewer = null
 
 let markersPlugin = null
+let autorotate = null
 
 let debounceTimer = null
 
 const refMap = ref({})
+
+let isInit = true
+const animatedValues = {
+    pitch: { start: -Math.PI / 2, end: 0 },
+    yaw: { start: Math.PI / 2, end: 0 },
+    zoom: { start: 0, end: 50 },
+    maxFov: { start: 130, end: 90 },
+    fisheye: { start: 2, end: 0 },
+};
+
 const setRefMap = (el, marker) => {
     if (el) {
         refMap.value[marker.config.id] = el
@@ -100,6 +118,18 @@ watch(() => state.markers, (newVal, oldVal) => {
     state.needHideMarkers = state.markers.filter(m => m.config.data.type !== 'default').map(m => m.config.id)
 })
 
+watch(visibility, (val) => {
+    console.log('valvalval', val, autorotate);
+
+    //todo 想在窗口未激活时暂停动画但是没有生效
+    if (val === 'hidden') {
+        autorotate.stop();
+    } else {
+        autorotate.start();
+    }
+
+})
+
 onUpdated(() => {
     console.log(state.needHideMarkers);
     state.needHideMarkers.forEach(id => {
@@ -112,9 +142,12 @@ onUpdated(() => {
 
 const changeScene = (scene) => {
     viewer.setPanorama(scene.img, {
-        zoom: 0
+        zoom: 50
     }).then(() => {
         makeMarkers(viewer, scene)
+        if (!autorotate.isEnabled()) {
+            autorotate.start();
+        }
     })
 }
 
@@ -136,25 +169,34 @@ const initViewer = (sceneData) => {
         // 设置图片描述
         description: "这是一个描述,xxxxxxxxxxxxxxxxx",
         loadingImg,
+
+        defaultPitch: animatedValues.pitch.start,
+        defaultYaw: animatedValues.yaw.start,
+        defaultZoomLvl: animatedValues.zoom.start,
+        maxFov: animatedValues.maxFov.start,
+        fisheye: animatedValues.fisheye.start,
+
         size: {
             width: '100%',
             height: '100%'
         },
-        canvasBackground: '#77addb',
-        defaultZoomLvl: 0,
-        // maxFov: 100,
-        // minFov: 0,
         navbar: ['zoom', 'move', 'download', 'fullscreen'],
         plugins: [
-            [MarkersPlugin, {
-                // markers: imgData.markers
+            [AutorotatePlugin, {
+                autostartDelay: null,
+                autostartOnIdle: false,
+                autorotatePitch: 0,
+                autorotateSpeed: '0.2rpm',
             }],
+            [MarkersPlugin, {}],
         ],
     });
 
     markersPlugin = viewer.getPlugin(MarkersPlugin);
-    initEvents(viewer, sceneData)
 
+    autorotate = viewer.getPlugin(AutorotatePlugin);
+
+    initEvents(viewer, sceneData)
 }
 
 /**
@@ -164,25 +206,38 @@ const initViewer = (sceneData) => {
 const initEvents = (viewer, sceneData) => {
     viewer.addEventListener('click', (e, data) => {
         // 点击全景图事件
-        console.log('click e:', e)
+        // console.log('click e:', e)
+
         state.activeMarker = null
+        // autorotate.toggle()
+
+        autorotate.stop();
+        setTimeout(() => autorotate.start(), 5000);
     })
 
 
     viewer.addEventListener('position-updated', (e) => {
         // console.log(e.position)
-        console.log('相面移动');
+        // console.log('相面移动');
 
     });
 
+    viewer.addEventListener('dblclick', ({ data }) => {
+        viewer.animate({
+            yaw: data.yaw,
+            pitch: data.pitch,
+            zoom: 100,
+            speed: 1000,
+        });
+    });
+
     viewer.addEventListener('zoom-updated', ({ zoomLevel }) => {
-        console.log(`new zoom level is ${zoomLevel}`);
+        // console.log(`new zoom level is ${zoomLevel}`);
     });
 
 
     // 在 addMarker 后添加事件监听
     markersPlugin.addEventListener('select-marker', (e) => {
-
         const { data, state } = e.marker
         console.log(data);
         if (data.type === 'customStep') {
@@ -194,13 +249,9 @@ const initEvents = (viewer, sceneData) => {
             })
         }
 
-        // setActiveMarker({
-        //     marker: e.marker,
-        //     position: state.position2D
-        // })
-
         // console.log('marker在屏幕上的坐标', e.marker.state.position2D);
     });
+
 
     viewer.addEventListener('ready', () => {
         console.log(`viewer is ready`);
@@ -208,19 +259,14 @@ const initEvents = (viewer, sceneData) => {
         // markersPlugin.hideMarker('marker1')
         // markersPlugin.showMarker('marker1')
         // markersPlugin.showMarkerTooltip('marker1')
-        // viewer.animate({
-        //     zoom: 0,
-        //     speed: '200rpm',
-        // })
 
-        // viewer.setOptions({
-        //     zoomLevel: 0,
-        // })
 
-        viewer.zoom(0)
+        // viewer.zoom(0)
 
         makeMarkers(viewer, sceneData)
-
+        if (isInit) {
+            intro(animatedValues.pitch.end, animatedValues.pitch.end);
+        }
     });
 
     // 在 render 事件中使用防抖更新位置
@@ -229,14 +275,16 @@ const initEvents = (viewer, sceneData) => {
 }
 
 const makeMarkers = (_, sceneData) => {
-    markersPlugin.clearMarkers()
-    sceneData.markers.forEach(m => {
-        markersPlugin.addMarker(m)
-        if (m.autoShow) {
-            markersPlugin.showMarkerTooltip(m.id)
-        }
-    })
-    state.markers = markersPlugin.getMarkers()
+    if (markersPlugin) {
+        markersPlugin.clearMarkers()
+        sceneData.markers.forEach(m => {
+            markersPlugin.addMarker(m)
+            if (m.autoShow) {
+                markersPlugin.showMarkerTooltip(m.id)
+            }
+        })
+        state.markers = markersPlugin.getMarkers()
+    }
 }
 
 /**
@@ -254,19 +302,51 @@ const debounceUpdate = () => {
     }
 }
 
+const intro = (pitch, yaw) => {
+    isInit = false;
+    autorotate.stop();
+    viewer.navbar.hide();
 
+    new utils.Animation({
+        properties: {
+            ...animatedValues,
+            pitch: { start: animatedValues.pitch.start, end: pitch },
+            yaw: { start: animatedValues.yaw.start, end: yaw },
+        },
+        duration: 2500,
+        easing: 'inOutQuad',
+        onTick: (properties) => {
+            viewer.setOptions({
+                fisheye: properties.fisheye,
+                maxFov: properties.maxFov,
+            });
+            viewer.rotate({ yaw: properties.yaw, pitch: properties.pitch });
+            viewer.zoom(properties.zoom);
+        },
+    }).then(() => {
+        autorotate.start();
+        viewer.navbar.show();
+        viewer.setOptions({
+            mousemove: true,
+            mousewheel: true,
+        });
+    });
+}
+/**
+ * @description: 销毁viewer实例
+ * @return {*}
+ */
 const destroyViewer = () => {
     if (viewer) try {
         viewer.destroy()
     } catch (e) {
-        console.log(e)
         viewerDom.value.removeChild(viewer.childNodes[0])
     }
 }
 
 onMounted(() => {
     initViewer(sceneConfig[0])
-    changeScene(sceneConfig[0])
+    // changeScene(sceneConfig[0])
 })
 
 
@@ -277,9 +357,6 @@ const handleClickAction = (marker, data) => {
         const sceneData = sceneConfig.find(item => item.name === marker.config.data.to)
         changeScene(sceneData)
     }
-
-
-
 }
 </script>
 

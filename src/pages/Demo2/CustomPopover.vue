@@ -2,7 +2,7 @@
  * @Author: zhanghao
  * @Date: 2025-04-05 11:31:39
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-06 09:01:11
+ * @LastEditTime: 2025-04-07 21:32:24
  * @Description: 
  * @FilePath: /vite-vue/src/pages/Demo2/CustomPopover.vue
 -->
@@ -97,7 +97,7 @@ const onClickOutside = () => {
 
 
 onMounted(() => {
-    console.log(marker.config.size);
+    // console.log(marker.config.size);
 })
 
 const handleButtonClick = () => {
