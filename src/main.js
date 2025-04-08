@@ -2,7 +2,7 @@
  * @Author: zhanghao
  * @Date: 2025-03-25 21:48:49
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-06 09:07:51
+ * @LastEditTime: 2025-04-08 09:31:58
  * @Description:
  * @FilePath: /vite-vue/src/main.js
  */
@@ -10,9 +10,9 @@ import { createApp, createElementBlock } from "vue";
 import "./style.css";
 import App from "./App.vue";
 
-import "normalize.css/normalize.css";
-import "./assets/css/reset.css";
-import "./assets/css/border.css";
+// import "normalize.css/normalize.css";
+// import "./assets/css/reset.css";
+// import "./assets/css/border.css";
 
 import "./assets/css/tailwind.css";
 

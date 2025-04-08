@@ -199,6 +199,11 @@
   dependencies:
     three "^0.175.0"
 
+"@photo-sphere-viewer/gyroscope-plugin@^5.13.1":
+  version "5.13.1"
+  resolved "https://registry.npmmirror.com/@photo-sphere-viewer/gyroscope-plugin/-/gyroscope-plugin-5.13.1.tgz#3fddc947555778a8e1f23740ee7fac6cfac8c191"
+  integrity sha512-HMsric/lM21i6gB2kBe4Db4AcupclaC2tUqLi78al5N2KYDBHqFHL4eyva+6WKNO+iABfV3XrzkZ4xAOOKCywg==
+
 "@photo-sphere-viewer/markers-plugin@^5.13.1":
   version "5.13.1"
   resolved "https://registry.npmmirror.com/@photo-sphere-viewer/markers-plugin/-/markers-plugin-5.13.1.tgz#22c55aa8d0e146677b749411be37c1adca2bf835"

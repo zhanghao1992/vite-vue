@@ -2,7 +2,7 @@
  * @Author: zhanghao
  * @Date: 2025-04-05 11:31:39
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-07 21:32:24
+ * @LastEditTime: 2025-04-08 09:32:24
  * @Description: 
  * @FilePath: /vite-vue/src/pages/Demo2/CustomPopover.vue
 -->
@@ -25,15 +25,15 @@
             <template #content>
                 <div class="devicePannel min-w-40">
                     <div class="item">
-                        <span class="text-9xl">设备名称：</span><span> {{ marker.config.data.deviceName }}
+                        <span class="text-base/6">设备名称：</span><span> {{ marker.config.data.deviceName }}
                         </span>
                     </div>
                     <div class="item">
-                        <span class="text-base/16">状态：</span><span class="text-green-300"> 正常
+                        <span class="text-base/6">状态：</span><span class="text-green-300"> 正常
                         </span>
                     </div>
                     <div class="item">
-                        <span class="text-base/16">电压：</span><span> 220V
+                        <span class="text-base/6">电压：</span><span> 220V
                         </span>
                     </div>
                     <div class="flex justify-between pt-[10px]">

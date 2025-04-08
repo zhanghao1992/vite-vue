@@ -2,7 +2,7 @@
  * @Author: zhanghao
  * @Date: 2025-04-02 17:07:58
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-06 08:43:27
+ * @LastEditTime: 2025-04-08 10:24:36
  * @Description:
  * @FilePath: /vite-vue/src/pages/Demo2/config.js
  */
@@ -171,26 +171,114 @@ const sceneConfig = [
           type: "customStep",
           to: "sene1",
         },
-        hoverTooltip: null,
-        clickTooltip: null,
       },
       {
         id: "marker6",
         autoShow: true,
-        position: { yaw: 0.58, pitch: -0.1 },
+        position: { yaw: 0.57, pitch: -0.08 },
         image: tipImage,
         size: { width: 32, height: 32 },
         anchor: "bottom center",
         zoomLvl: 100,
+        autoShow: true,
         tooltip: {
           content: "一盆花",
         },
         data: {
           deviceName: "花",
           deviceId: "deviceId1",
-          autoShow: false,
           content: "一盆花",
           type: "default",
+        },
+      },
+    ],
+  },
+  {
+    name: "sene3",
+    img: image4,
+    markers: [
+      {
+        id: "marker7",
+        position: { yaw: 0.09, pitch: -0 },
+        image: turnImage,
+        size: { width: 32, height: 32 },
+        data: {
+          deviceName: "makeDom",
+          deviceId: "deviceId1",
+          autoShow: false,
+          content: "makeDom",
+          type: "customStep",
+          to: "sene1",
+        },
+      },
+      {
+        id: "marker8",
+        position: { yaw: 2.19, pitch: -0.136 },
+        image: tipImage,
+        size: { width: 32, height: 32 },
+        autoShow: true,
+        tooltip: {
+          content: "一盆花",
+        },
+        data: {
+          deviceName: "花",
+          deviceId: "deviceId1",
+          content: "一盆花",
+          type: "default",
+        },
+      },
+      {
+        id: "marker8-1",
+        position: { yaw: 2.09, pitch: -0.14 },
+        image: tipImage,
+        size: { width: 32, height: 32 },
+        autoShow: true,
+        tooltip: {
+          content: "二盆花",
+        },
+        data: {
+          deviceName: "花",
+          deviceId: "deviceId1",
+          content: "一盆花",
+          type: "default",
+        },
+      },
+      {
+        id: "marker8-2",
+        position: { yaw: 1.96, pitch: -0.15 },
+        image: tipImage,
+        size: { width: 32, height: 32 },
+        autoShow: true,
+        tooltip: {
+          content: "三盆花",
+        },
+        data: {
+          deviceName: "花",
+          deviceId: "deviceId1",
+          content: "一盆花",
+          type: "default",
+        },
+      },
+    ],
+  },
+  {
+    name: "sene4",
+    img: image5,
+    markers: [
+      {
+        id: "marker9",
+        position: { yaw: 0.09, pitch: -0 },
+        image: turnImage,
+        size: { width: 32, height: 32 },
+        anchor: "bottom center",
+        zoomLvl: 100,
+        data: {
+          deviceName: "makeDom",
+          deviceId: "deviceId1",
+          autoShow: false,
+          content: "makeDom",
+          type: "customStep",
+          to: "sene1",
         },
       },
     ],

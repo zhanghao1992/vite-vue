@@ -2,7 +2,7 @@
  * @Author: zhanghao
  * @Date: 2025-03-25 21:54:53
  * @LastEditors: zhanghao
- * @LastEditTime: 2025-04-07 22:03:46
+ * @LastEditTime: 2025-04-08 10:25:07
  * @Description: 北京demo
  * @FilePath: /vite-vue/src/pages/Demo2/index.vue
 -->
@@ -13,6 +13,14 @@
         </div> -->
 
         <div id="viewer" ref="viewerDom"></div>
+
+        <div class="absolute left-0 top-6 flex gap-3 justify-center ">
+            <div class="w-1/12 " :class="{
+                'ring-2': scene.name === state.currentScene.name
+            }" v-for="scene in sceneConfig" @click="state.currentScene = scene">
+                <img :src="scene.img" class="" />
+            </div>
+        </div>
 
         <CustomPopover v-for="(marker) in state.customMarkers" :ref="(el) => setRefMap(el, marker)" :visible="true"
             :marker="marker" @click-action="handleClickAction">
@@ -48,6 +56,10 @@ import { Viewer, utils } from '@photo-sphere-viewer/core';
 
 import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 
+import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+
+
+
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import '@photo-sphere-viewer/markers-plugin/index.css'
 
@@ -68,7 +80,7 @@ const visibility = useDocumentVisibility()
 const options = sceneConfig.map(i => i.name)
 
 const state = reactive({
-    currentScene: options[0],
+    currentScene: sceneConfig[0],
     markers: [],
     customMarkers: [],
     customStepMarkers: [],
@@ -103,24 +115,17 @@ const setRefMap = (el, marker) => {
     }
 }
 
-watch(() => state.currentScene, (newVal, oldVal) => {
-    console.log(newVal);
-    const index = sceneConfig.findIndex(i => i.name === newVal)
-    // initViewer(imageConfig[index])
-    changeScene(sceneConfig[index])
-
-
+watch(() => state.currentScene, (newVal) => {
+    changeScene(newVal)
 })
 
-watch(() => state.markers, (newVal, oldVal) => {
-    state.customMarkers = state.markers.filter(m => m.config.data.type === 'custom')
-    state.customStepMarkers = state.markers.filter(m => m.config.data.type === 'customStep')
-    state.needHideMarkers = state.markers.filter(m => m.config.data.type !== 'default').map(m => m.config.id)
+watch(() => state.markers, (newVal) => {
+    state.customMarkers = newVal.filter(m => m.config.data.type === 'custom')
+    state.customStepMarkers = newVal.filter(m => m.config.data.type === 'customStep')
+    state.needHideMarkers = newVal.filter(m => m.config.data.type !== 'default').map(m => m.config.id)
 })
 
 watch(visibility, (val) => {
-    console.log('valvalval', val, autorotate);
-
     //todo 想在窗口未激活时暂停动画但是没有生效
     if (val === 'hidden') {
         autorotate.stop();
@@ -135,9 +140,6 @@ onUpdated(() => {
     state.needHideMarkers.forEach(id => {
         document.querySelector(`#psv-marker-${id}`).style.display = 'none'
     })
-
-
-
 })
 
 const changeScene = (scene) => {
@@ -169,13 +171,11 @@ const initViewer = (sceneData) => {
         // 设置图片描述
         description: "这是一个描述,xxxxxxxxxxxxxxxxx",
         loadingImg,
-
         defaultPitch: animatedValues.pitch.start,
         defaultYaw: animatedValues.yaw.start,
         defaultZoomLvl: animatedValues.zoom.start,
         maxFov: animatedValues.maxFov.start,
         fisheye: animatedValues.fisheye.start,
-
         size: {
             width: '100%',
             height: '100%'
@@ -189,6 +189,7 @@ const initViewer = (sceneData) => {
                 autorotateSpeed: '0.2rpm',
             }],
             [MarkersPlugin, {}],
+            [GyroscopePlugin, {}]
         ],
     });
 
@@ -206,7 +207,7 @@ const initViewer = (sceneData) => {
 const initEvents = (viewer, sceneData) => {
     viewer.addEventListener('click', (e, data) => {
         // 点击全景图事件
-        // console.log('click e:', e)
+        console.log('click e:', e)
 
         state.activeMarker = null
         // autorotate.toggle()
@@ -222,14 +223,14 @@ const initEvents = (viewer, sceneData) => {
 
     });
 
-    viewer.addEventListener('dblclick', ({ data }) => {
-        viewer.animate({
-            yaw: data.yaw,
-            pitch: data.pitch,
-            zoom: 100,
-            speed: 1000,
-        });
-    });
+    // viewer.addEventListener('dblclick', ({ data }) => {
+    //     viewer.animate({
+    //         yaw: data.yaw,
+    //         pitch: data.pitch,
+    //         zoom: 100,
+    //         speed: 1000,
+    //     });
+    // });
 
     viewer.addEventListener('zoom-updated', ({ zoomLevel }) => {
         // console.log(`new zoom level is ${zoomLevel}`);
@@ -271,13 +272,14 @@ const initEvents = (viewer, sceneData) => {
 
     // 在 render 事件中使用防抖更新位置
     viewer.addEventListener('render', debounceUpdate);
-
 }
 
 const makeMarkers = (_, sceneData) => {
     if (markersPlugin) {
         markersPlugin.clearMarkers()
         sceneData.markers.forEach(m => {
+            console.log(m);
+
             markersPlugin.addMarker(m)
             if (m.autoShow) {
                 markersPlugin.showMarkerTooltip(m.id)
@@ -355,7 +357,7 @@ const handleClickAction = (marker, data) => {
 
     if (marker.config.data.to) {
         const sceneData = sceneConfig.find(item => item.name === marker.config.data.to)
-        changeScene(sceneData)
+        state.currentScene = sceneData
     }
 }
 </script>
